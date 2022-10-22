@@ -23,15 +23,16 @@ class TransantionList extends StatelessWidget {
                     horizontal: 10,
                   ),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.purple, width: 2),
+                    border: Border.all(
+                        color: Theme.of(context).primaryColorDark, width: 2),
                   ),
                   padding: const EdgeInsets.all(10),
                   child: Text(
-                    '\$${tx.amount}',
-                    style: const TextStyle(
+                    '\$${tx.amount.toStringAsFixed(2)}',
+                    style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: Colors.purple,
+                      color: Theme.of(context).primaryColor,
                     ),
                   ),
                 ),
