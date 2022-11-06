@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 import './widget/new_transaction.dart';
+import './widget/transaction_list.dart';
+import './widget/chart.dart';
 import './model/transaction.dart';
-import 'widget/transaction_list.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
         title: 'personal expenses',
         theme: ThemeData(
           primarySwatch: Colors.green,
-          accentColor: Colors.lightGreenAccent,
+          accentColor: Colors.greenAccent,
           fontFamily: 'Murecho',
           appBarTheme: AppBarTheme(
             textTheme: ThemeData.light().textTheme.copyWith(),
@@ -34,26 +35,23 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final List<Transaction> _userTransactions = [
-    // Transaction(
-    //   id: 't1',
-    //   title: 'new shoes',
-    //   amount: 12.99,
-    //   date: DateTime.now(),
-    // ),
-    // Transaction(
-    //   id: 't2',
-    //   title: 'weekly groceries',
-    //   amount: 30.33,
-    //   date: DateTime.now(),
-    // )
-  ];
+  final List<Transaction> _userTransactions = [];
+  List<Transaction> get _recentTransactions {
+    return _userTransactions.where((tx) {
+      return tx.date.isAfter(
+        DateTime.now().subtract(
+          const Duration(days: 7),
+        ),
+      );
+    }).toList();
+  }
 
-  void _addNewTransaction(String txTitle, double txAmount) {
+  void _addNewTransaction(
+      String txTitle, double txAmount, DateTime chosenDate) {
     final newTx = Transaction(
       title: txTitle,
       amount: txAmount,
-      date: DateTime.now(),
+      date: chosenDate,
       id: DateTime.now().toString(),
     );
 
@@ -75,13 +73,19 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  void _deleteTransaction(String id) {
+    setState(() {
+      _userTransactions.removeWhere((element) => element.id == id);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('personal expenses'), actions: [
         IconButton(
           onPressed: () => _startAddNewTransaction(context),
-          icon: Icon(Icons.add),
+          icon: const Icon(Icons.add),
         ),
       ]),
       body: SingleChildScrollView(
@@ -94,17 +98,17 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Card(
                 elevation: 5,
                 color: Theme.of(context).primaryColor,
-                child: const Text('CHART'),
+                child: Chart(_recentTransactions),
               ),
             ),
-            TransantionList(_userTransactions),
+            TransantionList(_userTransactions, _deleteTransaction),
           ],
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
         onPressed: () => _startAddNewTransaction(context),
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
