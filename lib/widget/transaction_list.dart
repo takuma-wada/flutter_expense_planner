@@ -5,7 +5,11 @@ import '../model/transaction.dart';
 
 class TransantionList extends StatelessWidget {
   final List<Transaction> transactions;
-  TransantionList(this.transactions);
+  final Function deleteTx;
+  TransantionList(
+    this.transactions,
+    this.deleteTx,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +25,7 @@ class TransantionList extends StatelessWidget {
                 const SizedBox(
                   height: 30,
                 ),
-                Container(
+                SizedBox(
                   height: 200,
                   child: Image.asset(
                     'assets/images/waiting.png',
@@ -30,24 +34,29 @@ class TransantionList extends StatelessWidget {
                 ),
               ],
             )
-          : ListView(
-              children: transactions.map((tx) {
+          : ListView.builder(
+              itemBuilder: (ctx, index) {
                 return Card(
+                  elevation: 5,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
                   child: Row(
                     children: [
                       Container(
                         margin: const EdgeInsets.symmetric(
-                          vertical: 15,
+                          vertical: 20,
                           horizontal: 10,
                         ),
                         decoration: BoxDecoration(
-                          border: Border.all(
+                            border: Border.all(
                               color: Theme.of(context).primaryColorDark,
-                              width: 2),
-                        ),
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(20)),
                         padding: const EdgeInsets.all(10),
                         child: Text(
-                          '\$${tx.amount.toStringAsFixed(2)}',
+                          '\$${transactions[index].amount.toStringAsFixed(2)}',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -59,13 +68,15 @@ class TransantionList extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            tx.title,
+                            transactions[index].title,
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           Text(
-                            DateFormat().add_yMMMd().format(tx.date),
+                            DateFormat()
+                                .add_yMMMd()
+                                .format(transactions[index].date),
                             style: const TextStyle(
                               fontSize: 16,
                               color: Colors.grey,
@@ -73,10 +84,16 @@ class TransantionList extends StatelessWidget {
                           ),
                         ],
                       ),
+                      IconButton(
+                        onPressed: (() => deleteTx(transactions[index].id)),
+                        icon: const Icon(Icons.delete),
+                        color: Theme.of(context).errorColor,
+                      )
                     ],
                   ),
                 );
-              }).toList(),
+              },
+              itemCount: transactions.length,
             ),
     );
   }
